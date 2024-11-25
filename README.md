@@ -1,54 +1,17 @@
-# Starlight Starter Kit: Ion Theme
+# Welcome to Program with Conscience (PwC)! 
+Program with Conscience (or PwC) will be the site where we will talk about common programming anti-patterns and pet peeves we commonly encounter, having worked on and reviewed code from several projects.
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+This site aims to be more than just a styleguide, we try to go above and beyond what ESLint will tell you based on pitfalls we've run into ourselves, reviewing and writing code that powers enterprise applications and getting them to production.
 
-```
-npm create astro@latest -- --template louisescher/starlight-ion-theme
-```
+## ⚠️ Under Construction
+This site is still in progress! We've only dumped our content here but we'll soon start organizing it into tagged pages
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/louisescher/starlight-ion-theme)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/louisescher/starlight-ion-theme)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flouisescher%2Fstarlight-ion-theme&project-name=my-starlight-ion-docs&repository-name=my-starlight-ion-docs)
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-![158shots_so](https://github.com/louisescher/starlight-ion-theme/assets/66965600/64241499-8c8e-4672-bf4d-b2d8ff2a6862)
-
-## 🚀 Project Structure
-
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   │   ├── docs/
-│   │   └── config.ts
-│   ├── icons/
-│   ├── schemas/
-│   ├── styles/
-│   ├── utils/
-│   └── env.d.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
-```
-
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
-
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
-
-Static assets, like favicons, can be placed in the `public/` directory.
-
-Any component overrides made by this theme can be found in `src/components/`, any icons are located in `src/icons/`, and all styles are
-in the `src/styles/` directory.
-
-To find out more, start your development server and check out the **Features** page.
+## Who are we?
+We're senior node.js developers who work for a company called PwC (ANY similarity to our website name, living or dead, is PURELY coincidental). Combined, we have 15+ years of experience and have experienced our fair share of horror stories and are here to tell you about it.
 
 ## 🧞 Commands
+
+This project runs on Astro. Make sure you have Node.js installed. 
 
 All commands are run from the root of the project, from a terminal:
 
