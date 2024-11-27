@@ -20,15 +20,39 @@ importers:
       '@fontsource/space-mono':
         specifier: ^5.0.20
         version: 5.1.1
+      '@types/hast':
+        specifier: ^3.0.4
+        version: 3.0.4
       astro:
         specifier: 4.16.15
         version: 4.16.15(rollup@4.27.4)(typescript@5.7.2)
+      hast-util-from-html:
+        specifier: ^2.0.3
+        version: 2.0.3
+      hast-util-select:
+        specifier: ^6.0.3
+        version: 6.0.3
+      hast-util-to-string:
+        specifier: ^3.0.1
+        version: 3.0.1
+      hastscript:
+        specifier: ^9.0.0
+        version: 9.0.0
+      rehype:
+        specifier: ^13.0.2
+        version: 13.0.2
       sharp:
         specifier: ^0.33.3
         version: 0.33.5
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
+      vfile:
+        specifier: ^6.0.3
+        version: 6.0.3
 
 packages:
 
