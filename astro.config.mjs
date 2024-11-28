@@ -7,6 +7,7 @@ export default defineConfig({
 	site: 'https://louisescher.github.io',
 	base: '/starlight-ion-theme',
 	image: {
+		// TODO: Figure out how to set up sharp using PNPM
 		service: passthroughImageService(),
 	},
 	integrations: [
