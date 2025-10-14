@@ -1,0 +1,29 @@
+---
+title: Don't Jump Straight in Bed with Redux
+description: Don't jump straight in bed with Redux.
+severity: medium
+tags: React
+---
+
+Understand how Redux works, and why you are using it in your app.
+
+Are you using it just to avoid prop drilling because your app requires many components to access the same pieces of state? Since version 16.3, <a href="https://legacy.reactjs.org/blog/2018/03/29/react-v-16-3.html#official-context-api" target="_blank">React has created a new Context API</a> to address this exact situation. <a href="https://react.dev/learn/passing-data-deeply-with-context" target="_blank">Learn how to use it</a> to pass data deeply.
+
+Is Redux used in your app to help with caching state from the server and nothing else? Check out Vercel's <a href="https://swr.vercel.app/" target="_blank">SWR library</a> or <a href="https://tanstack.com/query/latest" target="_blank">TanStack Query</a> (formerly react-query). These libraries are designed for just this use case, which means you probably don't need Redux at this point in your app.
+
+### Why?
+
+Redux is a full-featured, opinionated state management tool. It can do many things, but maybe isn't the best at all of them (Mark Erkson, maintainer of Redux, said so himself in <a href="https://changelog.com/jsparty/146" target="_blank">this episode on the JS Party podcast</a> right around the hour-and-2-minute mark). Understanding what Redux does and the specific needs of your application allow you to decide the best tools to integrate with your application, instead of running `npm install react-redux` right after you create your React app and introduce indirection and unnecessary cluttering in your code.
+
+If after you evaluate your needs and find a match in Redux's capabilities, then by all means, use Redux. It can do some things really well, like:
+
+- Preserving a single source of truth
+- Managing large amounts of application state that constantly change
+- Handling complex logic to update state
+- Maintaining a history of how the application state has changed over time
+- Caching state from a server
+
+Oh, and before you get started, you might want to know, <a href="https://redux-toolkit.js.org/" target="_blank">Redux Toolkit</a> is now the <a href="https://redux.js.org/introduction/why-rtk-is-redux-today" target="_blank">officially-recommended</a> way to use Redux.
+
+> **Zaid's Note:** <a href="https://zustand-demo.pmnd.rs/" target="_blank">Zustand</a> (pronounced `tsoo-shtahnd`) is rapidly replacing Redux on React projects as a simpler alternative (to even @reduxjs/toolkit)!
+> If for nothing else, do check out their landing page. It's a work of art ❤️

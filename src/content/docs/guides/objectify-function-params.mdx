@@ -1,0 +1,85 @@
+---
+title: Objectify Function Params
+description: When your function has many optional parameters, define the params as an object.
+severity: medium
+tags: clean code
+---
+
+A real-life example from <a href="https://github.com/microsoft/azure-devops-node-api" target="_blank">Azure DevOps's Node.js API package</a> that I recently had to endure:
+
+```typescript
+const response = await gitApi.getItems(
+  repoId,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  {
+    versionType: GitVersionType.Branch,
+    version: branchName,
+  },
+);
+```
+
+Just do this instead, please:
+
+```typescript
+const response = await gitApi.getItems({
+  repoId,
+  versionDescriptor: {
+    versionType: GitVersionType.Branch,
+    version: branchName,
+  },
+});
+```
+
+It gets even worse when you want to pass that 9th parameter conditionally. If `branchName` is an optional parameter and isn't passed in the function call, we end up with atrocities like:
+
+```typescript
+// using Function.prototype.apply()
+const response = await gitApi.getItems.apply(
+  gitApi.getItems,
+  ...(branchName
+    ? [
+        repoId,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          versionType: GitVersionType.Branch,
+          version: branchName,
+        },
+      ]
+    : [repoId]),
+);
+
+// or just the good old if/else
+if (branchName) {
+  // ugly call goes here
+} else {
+  // not-so-ugly call goes here
+}
+```
+
+The same thing could be easily done with a single object as the param:
+
+```typescript
+const response = await gitApi.getItems.apply({
+  repoId,
+  ...(branchName
+    ? {
+        versionType: GitVersionType.Branch,
+        version: branchName,
+      }
+    : {}),
+});
+```
+
+Much neater, right? I don't like writing `undefined` so many times, even if I can copy/paste it or know some cool keyboard shortcut to duplicate it in my IDE. So please don't make me write `undefined` 7 times just because I want to pass an optional param that might be... _\*sigh\*_, `undefined`.

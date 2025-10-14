@@ -1,0 +1,235 @@
+---
+title: dontUseEffect
+description: Don't use `useEffect`
+severity: high
+tags: react
+---
+
+import { Image } from 'astro:assets';
+import bootstrapHeroSrc from '../../../assets/images/bootstrap-hero.png';
+import allWebsitesSameSrc from '../../../assets/images/all-websites-same.png';
+
+It's quite tempting to use `useEffect` to do a variety of tasks that make life easier (in the short run), however, it's worth remembering that every action you perform inside a `useEffect` hook is a side effect.
+
+There are situations where you need side effects or they're simply unavoidable but any component with more than 2-3 `useEffect` hooks is a sitting red flag. If you have a small atomic component like a button or a card, you probably don't need a `useEffect` to begin with.
+
+### I need to make an API call when the component mounts
+
+_Extension of <a href="/guides/reusable-api-wrappers">a previous point</a>_
+
+Directly using `useEffect` for this can be more detrimental than helpful. Instead, consider creating a custom hook that encapsulates the API call logic.
+
+Here's an example:
+
+```tsx
+// ✅ Good
+// This hook can also be extended to receive queryParams as a separate object instead of a part of
+// the URL but I left it this way for simplicity
+function useFetch(url: string) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // useEffect configured correctly so you don't have to on every component
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(url);
+      const data = await response.json();
+      // The BE team, for some reason, decides to nest the data several levels deep
+      setData(
+        // Navigating the JSON labyrinth here
+        data.data.apiData.iPromiseThisContainsTheData.dataAlmostThere.finally.some.data,
+      );
+      setLoading(false);
+    };
+
+    try {
+      fetchData();
+    } catch (error) {
+      setError(error);
+    }
+    // ⬇️ Only fires again when the baseURL or query params change
+  }, [url]);
+
+  return { data, loading };
+}
+
+function MyComponent() {
+  const { data: userData, loading } = useFetch(url);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  return <div>{userData}</div>;
+}
+```
+
+The benefit of this approach is that you can have multiple `useFetch`s on a page firing calls independent of each other. There are other standardization and DRY benefits highlighted in a [previous section](#12-api-integration-create-reusable-api-wrappers) This approach is quite harmonious and readable at the same time. Wouldn't you agree?
+
+[TanStack Query](https://tanstack.com/query/latest/docs/framework/react/overview) is a great library to use for API calls and has been used across tons of projects in production for a while now. It takes care of a lot of the boilerplate code you'd have to write for API calls and caching. In fact, it comes with so many bells and whistles that you [might not even need Redux to manage your state in most cases](#14-react-dont-jump-straight-in-bed-with-redux).
+
+#### I get that this approach is cleaner but what's the harm?
+
+Here's an unfortunate real life example:
+
+```tsx
+// ❌ Don't do this
+function MyComponent() {
+  // Data received from the API
+  const [data, setData] = useState(null);
+  // If set to true, a useEffect will fire an API call
+  const [shouldFireApi, setShouldFireApi] = useState(false);
+  // A parameter that is passed to the API call
+  const [importantApiParam, setImportantApiParam] = useState(null);
+
+  const handleApi = async () => {
+    // API call logic that fetches data and sets it in state
+  };
+
+  // Fetches param from the page URL and updates importantApiParam
+  useEffect(() => {
+    const paramFromUrl = new URLSearchParams(window.location.search).get('param');
+
+    // Asynchronously updates state in the next render
+    setImportantApiParam(paramFromUrl);
+
+    // ❌ This will cause the next hook to fire before the importantApiParam is set
+    setShouldFireApi(true);
+  }, [shouldFireApi]);
+
+  // This hook fires when shouldFireApi is set to true anywhere in the component
+  useEffect(() => {
+    if (shouldFireApi) {
+      handleApi();
+
+      setShouldFireApi(false);
+    }
+  }, [shouldFireApi]);
+
+  return <div>{data}</div>;
+}
+```
+
+This may seem contrived, but it's not uncommon to see this kind of pattern in real life. In this example, a new varaible called `importantParam` had to be introduced, which the `handleApi` would pass to the API request as a param. Suddenly, `handleApi` was no longer firing when this state variable changed!
+
+To remedy this, you'd add a useEffect that would then fire the API call when the `importantApiParam` changes like so,
+
+```tsx
+// Watches for changes in importantApiParam and fires the API call
+useEffect(() => {
+  if (importantApiParam) {
+    handleApi();
+  }
+}, [importantApiParam]);
+```
+
+Excellent! This works but you've done is added a lot of complexity to your component. You've introduced a lot of state that you need to manage and keep track of. This is a lot of cognitive overhead for a simple API call.
+
+What if, tomorrow, business says a new API param should also be passed to the API call? You'd have to add another state variable, another `useEffect` to manage that state, and another `useEffect` to fire the API call. This is a slippery slope that you don't want to be on.
+
+So let's summarize the benefits of using a custom hook:
+
+1. 🔎 **Readability**: It's easier to understand what a custom hook does by looking at its name than to read through a `useEffect` hook to understand what it does.
+2. ♻️ **Reusability**: You'd often find that you're doing the same data fetching logic in multiple components. The API dev insists on nesting the data 3 levels deep, and you're stuck writing the same `useEffect` logic in multiple components. A custom hook solves this problem.
+3. 🔁 **Prevent repetitive API calls**: If you're using a custom hook, you can easily prevent repetitive API calls caused by multiple component renders. This is especially useful if you're using a caching library like [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/overview). Only when you open the network tab would you be surprised to see how many times a component can re-render in a single session.
+4. 🕸️ **De-tangle yourself from an unmaintainable web of hooks**: [See example above](#whats-the-harm-in-using-useeffect-for-all-this-instead-of-a-custom-hook).
+
+### I have two state variables that need to be in sync
+
+In most cases, if you're in a situation where you need 2 variables to be in sync with each other, you're probably [framing your problem incorrectly to begin with](#usereducer-).
+
+However, you might find yourself in an unavoidable situation where you need to keep 2 state variables in sync, especially when the state variables are used in a complex calculation. Here are 2 approaches:
+
+#### useNaive 🙅
+
+```tsx
+const [count, setCount] = useState(0);
+
+// Initialize countPlusOne to count + 1 (pretend this is a very complex calculation)
+const [countPlusOne, setCountPlusOne] = useState(count + 1);
+
+// Update countPlusOne whenever count changes
+useEffect(() => {
+  setCountPlusOne(count + 1);
+}, [count]);
+```
+
+#### useMemo 🤷
+
+```tsx
+const [count, setCount] = useState(0);
+
+// Define countPlusOne as a memoized value that updates to count + 1 whenever count changes
+const countPlusOne = useMemo(() => count + 1, [count]);
+```
+
+Less boilerplate and more of keeping things closer to where they're used. The person who will be tirelessly maintaining your code when you go on your annual "spiritual" trip to Bali will thank you for it.
+
+You might find yourself in a situation where you need to update several state variables based on the previous state. Perhaps these state variables are loosely coupled and don't need to be in sync all the time, but they still update together in some predictable way. This is where `useReducer` comes in.
+
+#### useReducer 🤔
+
+Let's take a step back and consider what solution we're trying to design. Here's the naive approach visualized:
+
+<img width="869" alt="image" src="https://github.com/user-attachments/assets/ffc6eb4f-b92d-4dd5-94ac-35db27d9c0bf" />
+
+Despite the author's eye-pleasing visual rendition of the solution (or perhaps because of it), the problems here are painfully self-evident. This is a lot of boilerplate and a lot of cognitive (and performance) overhead for a simple problem. Things chained together like this are a nightmare to maintain and debug.
+
+Let's take a step back and try to visualize an ideal solution. In an ideal world, we'd want to:
+
+1. Bundle all the state variables together in some way.
+2. Reduce the number of state updates to only those that are necessary.
+
+This is exactly what `useReducer` helps us do!
+
+```tsx
+// Bundle all state variables into a single object. Again, a contrived example but pretend these are many variables
+const initialState = {
+  count: 0,
+  countPlusOne: 0,
+};
+
+// Write actions that handle the necessary updates so you don't have to write the same logic in multiple places.
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return {
+        ...state,
+        count: state.count + 1,
+        countPlusOne: state.count + 1,
+      };
+    case 'decrement':
+      return {
+        ...state,
+        count: state.count - 1,
+        countPlusOne: state.count + 1,
+      };
+    default:
+      throw new Error();
+  }
+}
+
+function MyComponent() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <div>
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
+      <p>count: {state.count}</p>
+      <p>countPlusOne: {state.countPlusOne}</p>
+    </div>
+  );
+}
+```
+
+Here's a visual representation of our new consolidated solution. Isn't she a beauty?
+
+<img width="865" alt="image" src="https://github.com/user-attachments/assets/c2fa96c4-74b9-47ed-bb24-608f9d7b8807" />
+
+This is a much cleaner solution that keeps all the logic in one place. It's easier to maintain and debug, and it's more performant than the naive approach. It takes away the emphasis on the individual state variables and instead focuses on the state as a whole.
+
+Truly, `useReducer` is probably the most underrated hook in React. It's a powerful tool that can help you manage complex state logic with ease. You probably wouldn't use it every day, but when you need it, it'll come in clutch for you.
+
+To sum up, `useEffect` isn't the work of the devil but it also isn't the answer to every problem. It's a powerful tool, but it's easy to misuse. The next time you find yourself reaching for `useEffect`, take a step back and consider if there's a better way to solve your problem. Quite often, there is.

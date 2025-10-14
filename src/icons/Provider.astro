@@ -5,16 +5,16 @@ type Props = {
   icon: string;
   class?: string;
   size?: 'sm' | 'lg';
-}
+};
 
 const { icon, size } = Astro.props;
 
-if (icon === "Provider") {
+if (icon === 'Provider') {
   throw new Error(`Invalid Icon "[${icon}]" passed to provider. This name is disabled by default.`);
 }
 
 let IconComponent = icons.find((iconFile) => {
-  return iconFile.file.split("/").pop()?.split(".astro")[0] === icon;
+  return iconFile.file.split('/').pop()?.split('.astro')[0] === icon;
 });
 
 if (!IconComponent) {
@@ -22,6 +22,6 @@ if (!IconComponent) {
 }
 ---
 
-<div class:list={["icon-container", size]}>
+<div class:list={['icon-container', size]}>
   <IconComponent.default />
 </div>
