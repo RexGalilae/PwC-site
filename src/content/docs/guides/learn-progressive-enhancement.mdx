@@ -1,0 +1,30 @@
+---
+title: Learn Progressive Enhancement
+description: Learn progressive enhancement
+severity: high
+tags: web, accessibility
+---
+
+### Huh?
+
+Yes, exactly. What in the world is progressive enhancement?
+
+The old trusty <a href="https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement" target="_blank">MDN web docs</a> tell us
+
+> **Progressive enhancement** is a design philosophy that provides a baseline of essential content and functionality to as many users as possible while delivering the best possible experience only to users of the most modern browsers that can run all the required code.
+
+So, progressive enhancement is a philosophy that aims to provide a stable, consistent user experience across user-agents (basically browsers when we are talking about the web). Translating this to layman's terms at the risk of providing a somewhat narrow definition, progressive enhancement is all about making your web app work without JavaScript. Make it _work_, not "pretty" or "dazzling" or even "smooth". **Work**. Christian Heilmann <a href="http://christianheilmann.com/2012/02/16/stumbling-on-the-escalator/" target="_blank">explains it nicely using the escalator as an illustration</a>.
+
+But perhaps it is better to think of progressive enhancement as building a flight of stairs that can function as an escalator whenever possible (electricity is provided, its passengers have opted for it, etc.). This difference in mindset is <a href="https://adactio.com/journal/9963" target="_blank">emphasized by Jeremy Keith</a> and is the crucial distinction between progressive enhancement and graceful degradation. Progressive enhancement builds from the ground up and adds extra enhancements for users who can experience them, while graceful degradation starts with the newest, fanciest technologies and tries to make sure there is something to fall back on in case they don't work. For those who entered the web dev space in the past decade, Single Page Applications have been "the thing" because of React, Vue, etc. Building progressive enhancement into our web apps requires a complete shift in our thinking and habits, back to the era of jQuery and Bootstrap (not that you should use either of these ancient artifacts) when progressive enhancement was (more so) the norm.
+
+### Why?
+
+Okay, but if progressive enhancement requires such a drastic change, is it really worth it? Who doesn't have JavaScript enabled on their browser, and who still uses IE nowadays? Read this <a href="https://www.kryogenix.org/code/browser/everyonehasjs.html" target="_blank">flow chart by Stuart Langridge</a> and see for yourself. JavaScript can be unavailable a lot more often than we think, and not just because someone disabled it on their browser. And why do we care if these "edge cases" happen? Because <a href="https://www.kryogenix.org/code/browser/why-availability/" target="_blank">availability matters</a>. Progressive enhancement's content-/accessibility-first approach can help address <a href="https://blog.hubspot.com/marketing/page-load-time-conversion-rates" target="_blank">factors that influence conversion rate</a> and <a href="https://www.tawk.to/customer-happiness/why-high-availability-is-important-for-customer-retention/" target="_blank">improve your customer retention</a>. Apply it and your website's traffic will benefit.
+
+Furthermore, discussions around progressive enhancement have been on the rise again, so new frameworks like <a href="https://remix.run/docs/en/main/pages/philosophy#progressive-enhancement" target="_blank">Remix</a> and <a href="https://kit.svelte.dev/docs/form-actions#progressive-enhancement" target="_blank">SvelteKit</a> are built with it in mind, and existing frameworks like <a href="https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions#progressive-enhancement" target="_blank">Next.js</a> and <a href="https://www.gatsbyjs.com/docs/glossary/progressive-enhancement/" target="_blank">Gatsby</a> are adding support for and documentation around it. There is no excuse for not learning it.
+
+### Unless...
+
+...progressive enhancement doesn't apply in your case.
+
+There are times when progressive enhancement doesn't make sense because of the nature of what is being built. For instance, games that rely on JavaScript or online JS library playgrounds - it simply does not make sense for these to be progressively enhanced (yes, some sort of message should be displayed to the user in case anything fails, but that is just error handling and not progressive enhancement). Learn progressive enhancement, master it, and toss it aside when it doesn't apply.

@@ -1,0 +1,74 @@
+---
+title: Query Params
+description: Case study on query params
+---
+
+## Problem
+
+Here's the source code we found on a real life multimillion dollar website with millions of monthly visitors.
+
+```ts
+var str1 = contentTypes && contentTypes.length !== 0 ? `&${arrayToQueryString(contentTypes, typeParam)}` : '';
+
+var str2 =
+  selectedLocations && selectedLocations.length !== 0 ? `&${arrayToQueryString(selectedLocations, locationParam)}` : '';
+var str3 = selectedSortBy?.length ? `&${arrayToQueryString(selectedSortBy, sortByParam)}` : '';
+var str4 = '';
+if (selectedDate.startDate) {
+  str4 = startDateParam ? `&${startDateParam}=${selectedDate.startDate}` : '';
+}
+if (selectedDate.endDate) {
+  str4 += endDateParam ? `&${endDateParam}=${selectedDate.endDate}` : '';
+}
+var str5 = selectedCategory?.length ? `&${arrayToQueryString(selectedCategory, categorieParam)}` : '';
+var str6 = selectedSeasons?.length ? `&${arrayToQueryString(selectedSeasons, seasonsParam)}` : '';
+
+const allFilterStr = str1 + str2 + str3 + str4 + str5 + str6;
+
+await handleApiRequest(apiUrl, lang, isLoadmore, '', allFilterStr);
+```
+
+#### What's the problem?
+
+Ooof where do we start?
+
+- Uses `var` instead of `let` or `const`
+- Variable names are not descriptive
+- Code is structured in a very imperative way (do this then do that)
+- Lots of repeating code! A helper function that accepts an object of key-value pairs and returns a query string would be much cleaner
+- Not extensible. If you want to add a new filter, you'll have to add `str7` and make sure you update the `allFilterStr` variable
+- Too many parameters are being passed to the `handleApiRequest` function See <a href="/guides/optional-function-params">this section for more</a>
+
+## Solution
+
+We can use a helper function that accepts an object of key-value pairs and returns a query string. This will make our code more readable and extensible.
+
+```ts
+const objectToQueryString = (obj: Record<string, any>) => {
+  return Object.entries(obj)
+    .filter(([_, value]) => value !== null && value !== undefined && value !== '')
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value.map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`).join('&');
+      }
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+    })
+    .join('&');
+};
+```
+
+Now we can use this function to create the query string for the `all` filter.
+
+```ts
+const allFilterStr = objectToQueryString({
+  [typeParam]: contentTypes,
+  [locationParam]: locations,
+  // ...
+});
+```
+
+### What are the benefits of this solution?
+
+- The code is more readable and easier to maintain
+- The code is more extensible.
+- The code is more testable with better error handling potential.
