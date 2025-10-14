@@ -7,8 +7,8 @@ import icon from 'astro-icon';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://louisescher.github.io',
-  base: '/',
+  site: 'https://RexGalilae.github.io',
+  base: '/PwC-site',
   image: {
     // TODO: Figure out how to set up sharp using PNPM
     service: passthroughImageService(),
